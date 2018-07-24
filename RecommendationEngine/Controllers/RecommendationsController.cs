@@ -33,10 +33,15 @@ namespace RecommendationEngine.Controllers
             {
                 //Get the TOP 5 city hashtags based on ethinicity
                 // db.Database.CommandTimeout = 900;
-                string cmdText = "Select top 5 GU_name as EthinicCity, Count(*) as EthinicPopulation from [CensusInfo]"
-                                    + " INNER JOIN EthinicityReference on IMPRACE = Ethinicity_Code "
-                                    + " INNER JOIN CountyFIPS  on State_FIPS_Code = STATE WHERE Ethinicity_Value LIKE '%" + ethinicity + "%' "
-                                    + " AND Entity_Description = 'City' Group By GU_name order by Count(*) desc";
+                //string cmdText = "Select top 5 GU_name as EthinicCity, Count(*) as EthinicPopulation from [CensusInfo]"
+                //                    + " INNER JOIN EthinicityReference on IMPRACE = Ethinicity_Code "
+                //                    + " INNER JOIN CountyFIPS  on State_FIPS_Code = STATE WHERE Ethinicity_Value LIKE '%" + ethinicity + "%' "
+                //                    + " AND Entity_Description = 'City' Group By GU_name order by Count(*) desc";
+
+                string cmdText = "Select top 5 STNAME, CTYNAME, sum(respop) as [Population] "
+                + "from censusinfo where imprace in (Select [Ethinicity_Code] from [EthinicityReference] where [Ethinicity_Value] like '%"+ ethinicity +"%') "
+                + "group by STNAME, CTYNAME "
+                + "order by [Population] Desc";
 
                 var recommendations = db.Database.SqlQuery<EthinicityResults>(cmdText).ToList();
 
@@ -44,7 +49,7 @@ namespace RecommendationEngine.Controllers
                 result.SuggestedTags = new List<HashTag>();
                 foreach (EthinicityResults er in recommendations)
                 {
-                    result.SuggestedTags.Add(new HashTag(100, "#" + er.EthinicCity));
+                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME + "_" +er.CTYNAME));
                 }
 
                 List<string> ethinicWords = ethinicity.Split(new char[] { ' ' }).ToList();
@@ -69,7 +74,7 @@ namespace RecommendationEngine.Controllers
                     if (!string.IsNullOrEmpty(hr.TwitterHandle))
                         result.SuggestedHandles.Add(new Handle(100, "Twitter", hr.TwitterHandle));
                     if (!string.IsNullOrEmpty(hr.InstagramHandle))
-                        result.SuggestedHandles.Add(new Handle(100, "insta", hr.InstagramHandle));
+                        result.SuggestedHandles.Add(new Handle(100, "Instagram", hr.InstagramHandle));
                 }
 
                 if (result == null)

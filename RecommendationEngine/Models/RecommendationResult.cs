@@ -43,8 +43,9 @@ namespace RecommendationEngine.Models
     public partial class EthinicityResults
     {
      
-        public string EthinicCity { get; set; }
-        public int EthinicPopulation { get; set; }
+        public string STNAME { get; set; }
+        public string CTYNAME { get; set; }
+        public int Population { get; set; }
 
     }
 
