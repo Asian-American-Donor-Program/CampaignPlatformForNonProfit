@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/5e16ffb2-091c-40c7-a049-be77d5fc7b9a/resourceGroups/StemCellsDonorCampaignPortal/providers/Microsoft.Web/sites/StemCellsDonorCampaignPortal",
+    "appService.deploySubpath": "build"
+}
