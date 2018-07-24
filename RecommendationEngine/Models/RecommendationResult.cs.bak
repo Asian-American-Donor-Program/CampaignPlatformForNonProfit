@@ -12,13 +12,6 @@ namespace RecommendationEngine.Models
         public List<Handle> SuggestedHandles{ get; set; }
       
     }
-    public partial class CognitiveRecommendationResult
-    {
-        //public int Confidence { get; set; }
-        public List<string> SuggestedKeywordTags{ get; set; }
-        public double SentimentScore{ get; set; }
-
-    }
 
     public partial class HashTag
     {
@@ -61,23 +54,5 @@ namespace RecommendationEngine.Models
         public string TwitterHandle { get; set; }
         public string InstagramHandle { get; set; }
 
-    }
-
-    public partial class Document
-    {
-        public string id { get; set; }
-        public List<string> keyPhrases { get; set; }
-        public double score { get; set; }
-    }
-
-    public partial class KeyWordResults
-    {
-        public List<Document> documents { get; set; }
-        public List<object> errors { get; set; }
-    }
-    public partial class SentimentResults
-    {
-        public List<Document> documents { get; set; }
-        public List<object> errors { get; set; }
     }
 }
