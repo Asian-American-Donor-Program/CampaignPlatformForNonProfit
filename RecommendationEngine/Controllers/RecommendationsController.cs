@@ -49,7 +49,7 @@ namespace RecommendationEngine.Controllers
                 result.SuggestedTags = new List<HashTag>();
                 foreach (EthinicityResults er in recommendations)
                 {
-                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME + "_" +er.CTYNAME));
+                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME + "_" +er.CTYNAME.Replace(" ","")));
                 }
 
                 List<string> ethinicWords = ethinicity.Split(new char[] { ' ' }).ToList();
