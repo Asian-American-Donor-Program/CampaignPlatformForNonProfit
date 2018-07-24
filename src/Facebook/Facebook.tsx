@@ -11,6 +11,7 @@ export interface IFacebookProps {
     profileName?: string;
     message?: string;
     media?: string;
+    mediaType: string;
 }
 
 class Facebook extends React.Component<IFacebookProps> {
@@ -29,11 +30,14 @@ class Facebook extends React.Component<IFacebookProps> {
                     </div>
                 </div>
                 <div className={'facebook-message'}>{this.props.message ? this.props.message : 'Be the Match Find a Cure'}<Links /></div>
-                <video width="588" controls={true}>
-                    <source src={this.props.media} type="video/mp4" />
-                    Your browser does not support HTML5 video.
-                        </video>
-                {/* <img src={this.props.media ? this.props.media : require('../images/placeholder.jpeg')} className={'facebook-media'} /> */}
+                {
+                    this.props.mediaType.indexOf('video') > -1 ?
+                        <video width="588" controls={true}>
+                            <source src={this.props.media} type="video/mp4" />
+                            Your browser does not support HTML5 video.
+                        </video> :
+                        <img src={this.props.media ? this.props.media : require('../images/placeholder.jpeg')} className={'facebook-media'} />
+                }
                 <div className={'facebook-actions'}>
                     <div className={'facebook-icon'}>
                         <i className={"icon ion-md-thumbs-up"} />

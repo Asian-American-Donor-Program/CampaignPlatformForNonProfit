@@ -12,6 +12,7 @@ export interface ITwitterProps {
     handle?: string;
     tweet?: string;
     media?: string;
+    mediaType: string;
 }
 
 class Twitter extends React.Component<ITwitterProps> {
@@ -29,11 +30,14 @@ class Twitter extends React.Component<ITwitterProps> {
                     </div>
                     <div className={'twitter-tweet'}>{this.props.tweet ? this.props.tweet : 'Only you can save lives'}<Links /></div>
                     <div className={'twitter-media-container'}>
-                        <video width="500" controls={true}>
-                            <source src={this.props.media} type="video/mp4" />
-                            Your browser does not support HTML5 video.
-                        </video>
-                        {/* <img src={this.props.media ? this.props.media : require('../images/placeholder.jpeg')} className={'twitter-media'} /> */}
+                        {
+                            this.props.mediaType.indexOf('video') > -1 ?
+                                <video width="500" controls={true}>
+                                    <source src={this.props.media} type="video/mp4" />
+                                    Your browser does not support HTML5 video.
+                                </video> :
+                                <img src={this.props.media ? this.props.media : require('../images/placeholder.jpeg')} className={'twitter-media'} />
+                        }
                     </div>
                     <div className={'twitter-actions'}>
                         <div className={'twitter-icon'}>

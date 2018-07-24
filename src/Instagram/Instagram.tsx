@@ -11,6 +11,7 @@ export interface IInstagramProps {
     profileName?: string;
     message?: string;
     media?: string;
+    mediaType: string;
 }
 
 class Instagram extends React.Component<IInstagramProps> {
@@ -21,11 +22,14 @@ class Instagram extends React.Component<IInstagramProps> {
                     <img src={this.props.profilePicture ? this.props.profilePicture : require('../images/persona.png')} className={'instgram-persona'} />
                     <div className={'instagram-name'}>{this.props.profileName ? this.props.profileName : 'BeTheMatch'}</div>
                 </div>
-                <video width="588" controls={true}>
-                    <source src={this.props.media} type="video/mp4" />
-                    Your browser does not support HTML5 video.
-                        </video>
-                {/* <img src={this.props.media ? this.props.media : require('../images/placeholder.jpeg')} className={'instagram-media'} /> */}
+                {
+                    this.props.mediaType.indexOf('video') > -1 ?
+                        <video width="588" controls={true}>
+                            <source src={this.props.media} type="video/mp4" />
+                            Your browser does not support HTML5 video.
+                        </video> :
+                        <img src={this.props.media ? this.props.media : require('../images/placeholder.jpeg')} className={'instagram-media'} />
+                }
                 <div className={'instagram-actions'}>
                     <div className={'instagram-actions-left'}>
                         <i className={"icon ion-md-heart"} />
