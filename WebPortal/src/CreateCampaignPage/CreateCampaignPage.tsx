@@ -195,7 +195,7 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
 
                 this.setState({ mediaArray: base64 });
 
-                if (this.state.message.length > 280) {
+                if (this.state.message.length >= 280) {
                     alert('Tweet too long. Please shorten tweet.');
                 }
                 else {
@@ -244,8 +244,9 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
                 postData(`https://recommendationengine.azurewebsites.net/api/recommendations`, messageInput)
                     .then(response => {
 
-                        const keywords = getKeywords(response.SuggestedKeywordTags);
-                        console.log(keywords);
+                        console.log(response);
+                        const keywordsMessage = getKeywords(response.SuggestedKeywordTags, messageInput);
+                        console.log(keywordsMessage);
 
                         const guidInput = getNewGUID();
 
@@ -256,7 +257,7 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
                                 const links = getLinks(response);
                                 console.log(links);
 
-                                const messageOut = messageInput + links + tags + keywords;
+                                const messageOut = keywordsMessage + links + tags;
                                 console.log(messageOut);
 
                                 this.setState({ ethnicity: ethnicityInput, guid: guidInput, media: file, mediaType: fileType, mediaUrl: fileUrl, preview: true, loading: false, loaded: true, message: messageOut });
