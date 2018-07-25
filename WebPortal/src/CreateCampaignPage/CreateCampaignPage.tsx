@@ -6,13 +6,15 @@ import Twitter from '../Twitter/Twitter';
 
 import { getTags, getKeywords, getLinks, getNewGUID, getData, postData } from '../Utils/utils';
 
-import './CreatePage.css';
+import './CreateCampaignPage.css';
 
 import { ethnicityList } from '../Utils/ethnicity';
 
-export interface ICreatePageState {
+export interface ICreateCampaignPageState {
     ethnicity: string;
     generic: boolean;
+    loading: boolean;
+    loaded: boolean;
     media: Blob;
     mediaArray: string;
     mediaType: string;
@@ -24,13 +26,17 @@ export interface ICreatePageState {
     twitter: string;
 }
 
-class CreatePage extends React.Component<{}, ICreatePageState> {
+class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
+    clicked = -1;
+
     constructor(props: {}) {
         super(props);
 
         this.state = {
             ethnicity: '',
             generic: false,
+            loading: false,
+            loaded: false,
             media: new Blob(),
             mediaArray: '',
             mediaType: '',
@@ -42,6 +48,8 @@ class CreatePage extends React.Component<{}, ICreatePageState> {
             twitter: ''
         }
 
+        this.onSubmit = this.onSubmit.bind(this);
+        this.onPost = this.onPost.bind(this);
         this.onPreview = this.onPreview.bind(this);
         this.onGeneric = this.onGeneric.bind(this);
         this.onPersonal = this.onPersonal.bind(this);
@@ -56,7 +64,7 @@ class CreatePage extends React.Component<{}, ICreatePageState> {
                 </div>
                 <hr />
                 <div className={'app-information'}>
-                    <form onSubmit={this.onPreview} className={'app-form'}>
+                    <form onSubmit={this.onSubmit} className={'app-form'}>
                         <div className={'app-information-generic'}>
                             <div className={'app-form-target'}>
                                 <div className={'app-form-target-title'}>Target Audience</div>
@@ -78,31 +86,23 @@ class CreatePage extends React.Component<{}, ICreatePageState> {
                                 </select>
                             </div>
                         </div>
-                        {
-                            this.state.generic ?
-                                null :
-                                <div className={'app-information-generic'}>
-                                    <div className={'app-form-target'}>
-                                        <div className={'app-form-target-title'}>Personalized</div>
-                                    </div>
-                                    <div className={'app-form-ethnicity'}>
-                                        <div className={'app-form-ethnicity-title'}>Message</div>
-                                        <input type={'text'} id={'message'} className={'app-form-message-input'} required={true} />
-                                    </div>
-                                </div>
-                        }
+                        <div className={'app-information-generic'}>
+                            <div className={'app-form-target'}>
+                                <div className={'app-form-target-title'}>Personalized</div>
+                            </div>
+                            <div className={'app-form-ethnicity'}>
+                                <div className={'app-form-ethnicity-title'}>Message</div>
+                                <input type={'text'} id={'message'} className={'app-form-message-input'} required={true} />
+                            </div>
+                        </div>
                         <div className={'app-form-footer'}>
-                            <input id="image-file" type="file" className={'app-input'} accept={'.mp4, .jpg'} />
+                            <input id="image-file" type="file" className={'app-input'} accept={'.mp4, .jpg'} required={true} />
                             <div style={{ padding: 5 }} />
+                            <input onClick={() => { this.clicked = 0; }} type="submit" value="Preview" className={'app-input'} />
+                            <div style={{ padding: 5 }} />
+                            <input onClick={() => { this.clicked = 1; }} type="submit" value="Post to Social Media" className={'app-input'} disabled={!this.state.loaded} />
                             {
-                                !this.state.posted && !this.state.posting ?
-                                    this.state.preview ?
-                                        <input type="submit" value="Post to Social Media" className={'app-input'} /> :
-                                        <input type="submit" value="Preview" className={'app-input'} /> :
-                                    null
-                            }
-                            {
-                                this.state.posting ?
+                                this.state.posting || this.state.loading ?
                                     <div className={'loader-container'}><div className={'loader'} /></div>
                                     : null
                             }
@@ -166,82 +166,92 @@ class CreatePage extends React.Component<{}, ICreatePageState> {
         this.setState({ generic: false });
     }
 
-    private onPreview(e: any) {
+    private onSubmit(e: any) {
         e.preventDefault();
 
-        if (this.state.preview) {
-            this.setState({ preview: false, posting: true });
-            const fr = new FileReader();
-            fr.onload = () => {
-                const data = fr.result;
-                const base64 = btoa(data);
-                const typeArray = this.state.mediaType.split('/');
-                const type = typeArray[0];
-                const ext = typeArray[1];
+        if (this.clicked === 0) {
+            this.onPreview();
+        }
+        else if (this.clicked === 1) {
+            this.onPost();
+        }
+    }
 
-                this.setState({ mediaArray: base64 });
+    private onPost() {
+        this.setState({ preview: false, posting: true });
+        const fr = new FileReader();
+        fr.onload = () => {
+            const data = fr.result;
+            const base64 = btoa(data);
+            const typeArray = this.state.mediaType.split('/');
+            const type = typeArray[0];
+            const ext = typeArray[1];
 
-                // ethnicity api
-                getData(`https://recommendationengine.azurewebsites.net/api/recommendations/${this.state.ethnicity}`)
+            this.setState({ mediaArray: base64 });
+
+            if (this.state.message.length > 280) {
+                alert('Tweet too long. Please shorten tweet.');
+            }
+            else {
+                let url = 'https://contentpublisherapp.azurewebsites.net/api/CampaignPublisher?code=xBXdwIOJ5bAybRXcCm9LyN61IWavNk43a6CJLUtxg9zwZrPVVQW4CQ==';
+                // url = ''; // uncomment to disable posting
+                // publishing api
+                postData(url, { media: base64, mediaCategory: type, mediaType: ext, message: this.state.message })
+                    .then(response => {
+                        console.log(response);
+                        this.setState({ posting: false, posted: true, twitter: response });
+
+                    }) // JSON from `response.json()` call
+                    .catch(error => console.error(error));
+            }
+        };
+        fr.readAsBinaryString(this.state.media);
+    }
+
+    private onPreview() {
+        // @ts-ignore
+        const ethnicityInput = document.getElementById('ethnicity') ? document.getElementById('ethnicity').value : '';
+        // @ts-ignore
+        const messageInput = document.getElementById("message") ? document.getElementById("message").value : undefined;
+        // @ts-ignore
+        const file = document.getElementById("image-file").files[0];
+        const fileUrl = URL.createObjectURL(file);
+        const fileType = file.type;
+
+        this.setState({ loading: true });
+
+        // ethnicity api
+        getData(`https://recommendationengine.azurewebsites.net/api/recommendations/${ethnicityInput}`)
+            .then(response => {
+
+                const tags = getTags(response.SuggestedTags);
+                console.log(tags);
+
+                // keyword api
+                postData(`https://recommendationengine.azurewebsites.net/api/recommendations`, messageInput)
                     .then(response => {
 
-                        const tags = getTags(response.SuggestedTags);
-                        console.log(tags);
+                        const keywords = getKeywords(response.SuggestedKeywordTags);
+                        console.log(keywords);
 
-                        // keyword api
-                        postData(`https://recommendationengine.azurewebsites.net/api/recommendations`, this.state.message)
+                        // links api
+                        postData(`https://urlcreate.azurewebsites.net/api/URLCreation?code=VGUNUOHanZnWnR7o6DgrtuDaR2WUu1zoYBvW64sqmbPNOWtoQ1vmIg==`, { GUID: getNewGUID() })
                             .then(response => {
 
-                                const keywords = getKeywords(response.SuggestedKeywordTags);
-                                console.log(keywords);
+                                const links = getLinks(response);
+                                console.log(links);
 
-                                // links api
-                                postData(`https://urlcreate.azurewebsites.net/api/URLCreation?code=VGUNUOHanZnWnR7o6DgrtuDaR2WUu1zoYBvW64sqmbPNOWtoQ1vmIg==`, { GUID: getNewGUID() })
-                                    .then(response => {
+                                const messageOut = messageInput + links + tags + keywords;
+                                console.log(messageOut);
 
-                                        const links = getLinks(response);
-                                        console.log(links);
-
-                                        const message = this.state.message + links + tags + keywords;
-                                        console.log(message);
-
-                                        if (message.length > 280) {
-                                            alert('Tweet too long. Please shorten tweet.');
-                                        }
-                                        else {
-                                            // publishing api
-                                            postData(`https://contentpublisherapp.azurewebsites.net/api/CampaignPublisher?code=xBXdwIOJ5bAybRXcCm9LyN61IWavNk43a6CJLUtxg9zwZrPVVQW4CQ==`, { media: base64, mediaCategory: type, mediaType: ext, message: this.state.message + links + tags + keywords })
-                                                .then(response => {
-                                                    console.log(response);
-                                                    this.setState({ posting: false, posted: true, twitter: response });
-
-                                                }) // JSON from `response.json()` call
-                                                .catch(error => console.error(error));
-                                        }
-                                    }) // JSON from `response.json()` call
-                                    .catch(error => console.error(error));
+                                this.setState({ ethnicity: ethnicityInput, media: file, mediaType: fileType, mediaUrl: fileUrl, preview: true, loading: false, loaded: true, message: messageOut });
                             }) // JSON from `response.json()` call
                             .catch(error => console.error(error));
                     }) // JSON from `response.json()` call
                     .catch(error => console.error(error));
-            };
-            fr.readAsBinaryString(this.state.media);
-        }
-        else {
-            // @ts-ignore
-            const ethnicityInput = document.getElementById('ethnicity') ? document.getElementById('ethnicity').value : '';
-            // @ts-ignore
-            const messageInput = document.getElementById("message") ? document.getElementById("message").value : undefined;
-            // @ts-ignore
-            const file = document.getElementById("image-file").files[0];
-            const fileUrl = URL.createObjectURL(file);
-            const fileType = file.type;
-            if (messageInput) {
-                this.setState({ message: messageInput });
-            }
-            this.setState({ ethnicity: ethnicityInput, media: file, mediaType: fileType, mediaUrl: fileUrl, preview: true });
-        }
+            }) // JSON from `response.json()` call
+            .catch(error => console.error(error));
     }
 }
 
-export default CreatePage;
+export default CreateCampaignPage;

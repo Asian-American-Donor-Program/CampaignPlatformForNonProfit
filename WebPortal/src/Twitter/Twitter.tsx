@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import Links from '../Links/Links';
-
 import * as moment from 'moment';
 
 import './Twitter.css';
@@ -28,7 +26,7 @@ class Twitter extends React.Component<ITwitterProps> {
                         <div className={'twitter-handle'}>{this.props.handle ? this.props.handle : '@BeTheMatch'}</div>
                         <div className={'twitter-time'}>&middot; {moment().fromNow()}</div>
                     </div>
-                    <div className={'twitter-tweet'}>{this.props.tweet ? this.props.tweet : 'Only you can save lives'}<Links /></div>
+                    <div className={'twitter-tweet'}>{this.props.tweet ? this.props.tweet : 'Only you can save lives'}</div>
                     <div className={'twitter-media-container'}>
                         {
                             this.props.mediaType.indexOf('video') > -1 ?

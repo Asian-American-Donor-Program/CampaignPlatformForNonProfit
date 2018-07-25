@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import Links from '../Links/Links';
-
 import * as moment from 'moment';
 
 import './Facebook.css';
@@ -29,7 +27,7 @@ class Facebook extends React.Component<IFacebookProps> {
                         </div>
                     </div>
                 </div>
-                <div className={'facebook-message'}>{this.props.message ? this.props.message : 'Be the Match Find a Cure'}<Links /></div>
+                <div className={'facebook-message'}>{this.props.message ? this.props.message : 'Be the Match Find a Cure'}</div>
                 {
                     this.props.mediaType.indexOf('video') > -1 ?
                         <video width="588" controls={true}>

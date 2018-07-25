@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import Links from '../Links/Links';
-
 import * as moment from 'moment';
 
 import './Instagram.css';
@@ -45,7 +43,7 @@ class Instagram extends React.Component<IInstagramProps> {
                 <div className={'instagram-comments-container'}>
                     <div className={'instagram-comment'}>
                         <div className={'instagram-comment-name'}>{this.props.profileName ? this.props.profileName : 'BeTheMatch'}</div>
-                        <div className={'instagram-comment-text'}>{this.props.message ? this.props.message : 'Be the Match Find a Cure'}<Links /></div>
+                        <div className={'instagram-comment-text'}>{this.props.message ? this.props.message : 'Be the Match Find a Cure'}</div>
                     </div>
                 </div>
                 <div className={'instagram-time'}>{moment().fromNow()}</div>
