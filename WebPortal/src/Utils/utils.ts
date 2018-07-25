@@ -28,7 +28,7 @@ function titleCase(str: string) {
 
 export function getLinks(input: string) {
     const inputArray = input.split(',')
-    const out = ` Register: ${inputArray[0]} Give: ${inputArray[1]} Learn More: ${inputArray[2]}`;
+    const out = ` Register: ${inputArray[0]} Give: ${inputArray[1]}`;
     return out;
 }
 

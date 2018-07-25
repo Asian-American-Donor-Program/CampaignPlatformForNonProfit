@@ -195,7 +195,7 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
 
                 this.setState({ mediaArray: base64 });
 
-                if (this.state.message.length >= 280) {
+                if (this.state.message.length >= 275) {
                     alert('Tweet too long. Please shorten tweet.');
                 }
                 else {
@@ -227,9 +227,15 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
         // @ts-ignore
         const messageInput = document.getElementById("message") ? document.getElementById("message").value : undefined;
         // @ts-ignore
-        const file = document.getElementById("image-file").files[0];
+        let file = document.getElementById("image-file").files[0];
         const fileUrl = URL.createObjectURL(file);
         const fileType = file.type;
+        const filesize = Number(((file.size / 1024) / 1024).toFixed(4));
+
+        if (filesize >= 15) {
+            alert('Selected file is too large. Please choose a smaller file.');
+            return;
+        }
 
         this.setState({ loading: true });
 
