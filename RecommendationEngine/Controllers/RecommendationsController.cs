@@ -7,8 +7,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using Newtonsoft.Json;
 using RecommendationEngine;
 using RecommendationEngine.Models;
 
@@ -40,7 +43,7 @@ namespace RecommendationEngine.Controllers
                 //                    + " AND Entity_Description = 'City' Group By GU_name order by Count(*) desc";
 
                 string cmdText = "Select top 5 STNAME, CTYNAME, sum(respop) as [Population] "
-                + "from censusinfo where imprace in (Select [Ethinicity_Code] from [EthinicityReference] where [Ethinicity_Value] like '%"+ ethinicity +"%') "
+                + "from censusinfo where imprace in (Select [Ethinicity_Code] from [EthinicityReference] where [Ethinicity_Value] like '%" + ethinicity + "%') "
                 + "group by STNAME, CTYNAME "
                 + "order by [Population] Desc";
 
@@ -93,6 +96,63 @@ namespace RecommendationEngine.Controllers
 
 
             return Ok(result);
+        }
+
+
+        // GET: api/Recommendations/5
+        [ResponseType(typeof(RecommendationResult))]
+        //[Route("api/Recommendations/{messagetext}")]
+        [HttpPost]
+        public async Task<IHttpActionResult> GetCognitiveRecommendations(HttpRequestMessage requestMessage)
+        {
+            CognitiveRecommendationResult cognitiveResult = new CognitiveRecommendationResult();
+
+            try
+            {
+                string bethematch_coginitive_key = Helpers.Uitls.GetTokenFromKeyVault("bethematch-coginitive-key").Result;
+                //string keyPhrases_Url = "https://westus2.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases";
+                //string sentiment_Url = "https://westus2.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment";
+                HttpClient httpClient_KeyWords = new HttpClient();
+                httpClient_KeyWords.BaseAddress = new Uri("https://westus2.api.cognitive.microsoft.com");
+
+                httpClient_KeyWords.DefaultRequestHeaders.Add("Accept", "application/json");
+                httpClient_KeyWords.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", bethematch_coginitive_key);
+                var messageText = await requestMessage.Content.ReadAsStringAsync();
+                string payLoad = "{\"documents\": [{ \"language\": \"en\",\"id\": \"1\",\"text\":" + messageText + "}]}";
+
+                var stringContent_keyPhrases = new StringContent(payLoad, Encoding.UTF8, "application/json");
+                var result_keyPhrases = await httpClient_KeyWords.PostAsync("/text/analytics/v2.0/keyPhrases", stringContent_keyPhrases);
+
+                string result_keyPhrases_content = await result_keyPhrases.Content.ReadAsStringAsync();
+
+                KeyWordResults ctaResults_KeyWords = JsonConvert.DeserializeObject<KeyWordResults>(result_keyPhrases_content);
+                cognitiveResult.SuggestedKeywordTags = ctaResults_KeyWords.documents[0].keyPhrases.Take(5).ToList();
+                List<string> cleanedKeywordTags = new List<string>();
+                foreach (string tag in cognitiveResult.SuggestedKeywordTags)
+                {
+                    cleanedKeywordTags.Add("#" + tag.Replace(" ", "_"));
+                }
+                cognitiveResult.SuggestedKeywordTags = cleanedKeywordTags;
+                HttpClient httpClient_Sentiment = new HttpClient();
+                httpClient_Sentiment.BaseAddress = new Uri("https://westus2.api.cognitive.microsoft.com");
+
+                httpClient_Sentiment.DefaultRequestHeaders.Add("Accept", "application/json");
+                httpClient_Sentiment.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", bethematch_coginitive_key);
+
+                var stringContent_Sentiment = new StringContent(payLoad, Encoding.UTF8, "application/json");
+                var result_Sentiment = await httpClient_Sentiment.PostAsync("/text/analytics/v2.0/sentiment", stringContent_Sentiment);
+
+                string result_Sentiment_content = await result_Sentiment.Content.ReadAsStringAsync();
+
+                SentimentResults ctaResults_Sentiments = JsonConvert.DeserializeObject<SentimentResults>(result_Sentiment_content);
+                cognitiveResult.SentimentScore = ctaResults_Sentiments.documents[0].score;
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+
+            return Ok(cognitiveResult);
         }
 
 
