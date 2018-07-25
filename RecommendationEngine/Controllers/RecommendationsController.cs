@@ -45,18 +45,19 @@ namespace RecommendationEngine.Controllers
                 + "order by [Population] Desc";
 
                 var recommendations = db.Database.SqlQuery<EthinicityResults>(cmdText).ToList();
-
+                
                 result = new RecommendationResult();
-                result.SuggestedTags = new List<HashTag>();
-                //Regex.Replace(er.CTYNAME, @"\s+", "")
+                result.SuggestedTags = new HashSet<string>();
                 foreach (EthinicityResults er in recommendations)
                 {
-                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME.Replace(" ","") + "_" + er.CTYNAME.Replace(" ","")));
+                    result.SuggestedTags.Add( "#" + er.STNAME.Replace(" ", ""));
+                    result.SuggestedTags.Add("#" + er.CTYNAME.Replace(" ", "").Replace("County", ""));
                 }
-
+                
+             
                 List<string> ethinicWords = ethinicity.Split(new char[] { ' ' }).ToList();
-                List<string> conjunctions = new List<string>() { "alone", "and", "other", "or" };
 
+                List<string> conjunctions = new List<string>() { "alone", "and", "other", "or" };
                 string ethinicQuery = "";
                 foreach (string word in ethinicWords.Except(conjunctions))
                 {
@@ -70,7 +71,7 @@ namespace RecommendationEngine.Controllers
 
                 var handles = db.Database.SqlQuery<HandleResults>(cmdHandleText).ToList();
 
-                result.SuggestedHandles = new List<Handle>();
+                result.SuggestedHandles = new HashSet<Handle>();
                 foreach (HandleResults hr in handles)
                 {
                     if (!string.IsNullOrEmpty(hr.TwitterHandle))

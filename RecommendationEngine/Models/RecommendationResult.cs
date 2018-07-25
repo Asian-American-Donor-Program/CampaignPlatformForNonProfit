@@ -8,8 +8,8 @@ namespace RecommendationEngine.Models
     public partial class RecommendationResult
     {
         //public int Confidence { get; set; }
-        public List<HashTag> SuggestedTags { get; set; }
-        public List<Handle> SuggestedHandles{ get; set; }
+        public HashSet<string> SuggestedTags { get; set; }
+        public HashSet<Handle> SuggestedHandles{ get; set; }
       
     }
 
