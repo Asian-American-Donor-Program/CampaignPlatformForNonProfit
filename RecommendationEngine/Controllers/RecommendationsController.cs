@@ -139,7 +139,8 @@ namespace RecommendationEngine.Controllers
                 List<string> cleanedKeywordTags = new List<string>();
                 foreach (string tag in cognitiveResult.SuggestedKeywordTags)
                 {
-                    cleanedKeywordTags.Add("#" + tag.Replace(" ", "_"));
+                    cleanedKeywordTags.Add(tag);
+                    //cleanedKeywordTags.Add("#" + tag.Replace(" ", ""));
                 }
                 cognitiveResult.SuggestedKeywordTags = cleanedKeywordTags;
                 HttpClient httpClient_Sentiment = new HttpClient();
