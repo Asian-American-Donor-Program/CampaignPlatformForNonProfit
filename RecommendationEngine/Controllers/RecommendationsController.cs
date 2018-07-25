@@ -107,6 +107,7 @@ namespace RecommendationEngine.Controllers
             try
             {
                 //string bethematch_coginitive_key = Helpers.Uitls.GetTokenFromKeyVault("bethematch-coginitive-key").Result;
+                //removing it for now
                 string bethematch_coginitive_key = "8477696f1a16457c994934afde5871e9";
                 //string keyPhrases_Url = "https://westus2.api.cognitive.microsoft.com/text/analytics/v2.0/keyPhrases";
                 //string sentiment_Url = "https://westus2.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment";
