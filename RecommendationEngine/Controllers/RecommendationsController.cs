@@ -52,11 +52,11 @@ namespace RecommendationEngine.Controllers
                 result.SuggestedTags = new List<HashTag>();
                 foreach (EthinicityResults er in recommendations)
                 {
-                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME + "_" + er.CTYNAME));
+                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME.Trim().Replace(" ","_") + "_" + er.CTYNAME.Trim().Replace(" County","").Replace(" ","_")));
                 }
-
+               
                 List<string> ethinicWords = ethinicity.Split(new char[] { ' ' }).ToList();
-                List<string> conjunctions = new List<string>() { "alone", "and", "other", "or" };
+                List<string> conjunctions = new List<string>() { "alone", "and", "other", "or"};
 
                 string ethinicQuery = "";
                 foreach (string word in ethinicWords.Except(conjunctions))
