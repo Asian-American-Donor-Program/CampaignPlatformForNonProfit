@@ -6,6 +6,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -50,9 +51,10 @@ namespace RecommendationEngine.Controllers
 
                 result = new RecommendationResult();
                 result.SuggestedTags = new List<HashTag>();
+                //Regex.Replace(er.CTYNAME, @"\s+", "")
                 foreach (EthinicityResults er in recommendations)
                 {
-                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME + "_" + er.CTYNAME));
+                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME.Replace(" ","") + "_" + er.CTYNAME.Replace(" ","")));
                 }
 
                 List<string> ethinicWords = ethinicity.Split(new char[] { ' ' }).ToList();
