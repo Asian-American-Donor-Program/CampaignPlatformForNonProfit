@@ -13,6 +13,7 @@ import { ethnicityList } from '../Utils/ethnicity';
 export interface ICreateCampaignPageState {
     ethnicity: string;
     generic: boolean;
+    guid: string;
     loading: boolean;
     loaded: boolean;
     media: Blob;
@@ -35,6 +36,7 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
         this.state = {
             ethnicity: '',
             generic: false,
+            guid: '',
             loading: false,
             loaded: false,
             media: new Blob(),
@@ -198,12 +200,18 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
                 }
                 else {
                     let url = 'https://contentpublisherapp.azurewebsites.net/api/CampaignPublisher?code=xBXdwIOJ5bAybRXcCm9LyN61IWavNk43a6CJLUtxg9zwZrPVVQW4CQ==';
-                    // url = 'notaurl'; // uncomment to disable posting
+                    // url = 'notaurl'; // uncomment to disable posting4
                     // publishing api
                     postData(url, { media: base64, mediaCategory: type, mediaType: ext, message: this.state.message })
                         .then(response => {
                             console.log(response);
                             this.setState({ posting: false, posted: true, twitter: response });
+
+                            postData('https://urlcreate.azurewebsites.net/api/PostedURLs?code=t36ZnawOQ7peWX4D2x6jwhkLJPTlu1z3px8l4QqA12/snXpVBc2w/A==', { GUID: this.state.guid, PostedURL: response })
+                                .then(response => {
+                                    console.log(response);
+                                }) // JSON from `response.json()` call
+                                .catch(error => console.error(error));
 
                         }) // JSON from `response.json()` call
                         .catch(error => console.error(error));
@@ -239,8 +247,10 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
                         const keywords = getKeywords(response.SuggestedKeywordTags);
                         console.log(keywords);
 
+                        const guidInput = getNewGUID();
+
                         // links api
-                        postData(`https://urlcreate.azurewebsites.net/api/URLCreation?code=VGUNUOHanZnWnR7o6DgrtuDaR2WUu1zoYBvW64sqmbPNOWtoQ1vmIg==`, { GUID: getNewGUID() })
+                        postData(`https://urlcreate.azurewebsites.net/api/URLCreation?code=VGUNUOHanZnWnR7o6DgrtuDaR2WUu1zoYBvW64sqmbPNOWtoQ1vmIg==`, { GUID: guidInput })
                             .then(response => {
 
                                 const links = getLinks(response);
@@ -249,7 +259,7 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
                                 const messageOut = messageInput + links + tags + keywords;
                                 console.log(messageOut);
 
-                                this.setState({ ethnicity: ethnicityInput, media: file, mediaType: fileType, mediaUrl: fileUrl, preview: true, loading: false, loaded: true, message: messageOut });
+                                this.setState({ ethnicity: ethnicityInput, guid: guidInput, media: file, mediaType: fileType, mediaUrl: fileUrl, preview: true, loading: false, loaded: true, message: messageOut });
                             }) // JSON from `response.json()` call
                             .catch(error => console.error(error));
                     }) // JSON from `response.json()` call
