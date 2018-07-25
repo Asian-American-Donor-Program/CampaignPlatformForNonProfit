@@ -42,7 +42,7 @@ namespace RecommendationEngine.Controllers
                 //                    + " AND Entity_Description = 'City' Group By GU_name order by Count(*) desc";
 
                 string cmdText = "Select top 5 STNAME, CTYNAME, sum(respop) as [Population] "
-                + "from censusinfo where imprace in (Select [Ethinicity_Code] from [EthinicityReference] where [Ethinicity_Value] like '%"+ ethinicity +"%') "
+                + "from censusinfo where imprace in (Select [Ethinicity_Code] from [EthinicityReference] where [Ethinicity_Value] like '%" + ethinicity + "%') "
                 + "group by STNAME, CTYNAME "
                 + "order by [Population] Desc";
 
@@ -52,7 +52,7 @@ namespace RecommendationEngine.Controllers
                 result.SuggestedTags = new List<HashTag>();
                 foreach (EthinicityResults er in recommendations)
                 {
-                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME + "_" +er.CTYNAME));
+                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME + "_" + er.CTYNAME));
                 }
 
                 List<string> ethinicWords = ethinicity.Split(new char[] { ' ' }).ToList();
@@ -115,7 +115,7 @@ namespace RecommendationEngine.Controllers
                 httpClient_KeyWords.DefaultRequestHeaders.Add("Accept", "application/json");
                 httpClient_KeyWords.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", bethematch_coginitive_key);
                 var messageText = await requestMessage.Content.ReadAsStringAsync();
-                string payLoad = "{\"documents\": [{ \"language\": \"en\",\"id\": \"1\",\"text\": \"" + messageText + "\"}]}";
+                string payLoad = "{\"documents\": [{ \"language\": \"en\",\"id\": \"1\",\"text\":" + messageText + "}]}";
 
                 var stringContent_keyPhrases = new StringContent(payLoad, Encoding.UTF8, "application/json");
                 var result_keyPhrases = await httpClient_KeyWords.PostAsync("/text/analytics/v2.0/keyPhrases", stringContent_keyPhrases);
@@ -124,7 +124,12 @@ namespace RecommendationEngine.Controllers
 
                 KeyWordResults ctaResults_KeyWords = JsonConvert.DeserializeObject<KeyWordResults>(result_keyPhrases_content);
                 cognitiveResult.SuggestedKeywordTags = ctaResults_KeyWords.documents[0].keyPhrases.Take(5).ToList();
-
+                List<string> cleanedKeywordTags = new List<string>();
+                foreach (string tag in cognitiveResult.SuggestedKeywordTags)
+                {
+                    cleanedKeywordTags.Add("#" + tag.Replace(" ", "_"));
+                }
+                cognitiveResult.SuggestedKeywordTags = cleanedKeywordTags;
                 HttpClient httpClient_Sentiment = new HttpClient();
                 httpClient_Sentiment.BaseAddress = new Uri("https://westus2.api.cognitive.microsoft.com");
 
@@ -143,7 +148,7 @@ namespace RecommendationEngine.Controllers
             {
                 return InternalServerError(ex);
             }
-  
+
             return Ok(cognitiveResult);
         }
 

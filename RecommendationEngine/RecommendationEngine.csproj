@@ -110,6 +110,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\RecommendationEngine - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\RecommendationEngineDebug - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
