@@ -41,7 +41,7 @@ namespace RecommendationEngine.Controllers
                 //                    + " INNER JOIN CountyFIPS  on State_FIPS_Code = STATE WHERE Ethinicity_Value LIKE '%" + ethinicity + "%' "
                 //                    + " AND Entity_Description = 'City' Group By GU_name order by Count(*) desc";
 
-                string cmdText = "Select top 5 STNAME, CTYNAME, sum(respop) as [Population] "
+                string cmdText = "Select top 3 STNAME, CTYNAME, sum(respop) as [Population] "
                 + "from censusinfo where imprace in (Select [Ethinicity_Code] from [EthinicityReference] where [Ethinicity_Value] like '%" + ethinicity + "%') "
                 + "group by STNAME, CTYNAME "
                 + "order by [Population] Desc";
@@ -49,14 +49,24 @@ namespace RecommendationEngine.Controllers
                 var recommendations = db.Database.SqlQuery<EthinicityResults>(cmdText).ToList();
 
                 result = new RecommendationResult();
+                List<string> recommendedHashTags = new List<string>();
                 result.SuggestedTags = new List<HashTag>();
                 foreach (EthinicityResults er in recommendations)
                 {
-                    result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME.Trim().Replace(" ","_") + "_" + er.CTYNAME.Trim().Replace(" County","").Replace(" ","_")));
+                    if (!(recommendedHashTags.Contains(er.STNAME)))
+                    {
+                        recommendedHashTags.Add(er.STNAME);
+                        result.SuggestedTags.Add(new HashTag(100, "#" + er.STNAME.Trim().Replace(" ", "")));
+                    }
+                    if (!(recommendedHashTags.Contains(er.CTYNAME)) )
+                    {
+                        recommendedHashTags.Add(er.CTYNAME);
+                        result.SuggestedTags.Add(new HashTag(100, "#" + er.CTYNAME.Trim().Replace(" County", "").Replace(" ", "")));
+                    }
                 }
-               
+
                 List<string> ethinicWords = ethinicity.Split(new char[] { ' ' }).ToList();
-                List<string> conjunctions = new List<string>() { "alone", "and", "other", "or"};
+                List<string> conjunctions = new List<string>() { "alone", "and", "other", "or" };
 
                 string ethinicQuery = "";
                 foreach (string word in ethinicWords.Except(conjunctions))
@@ -67,7 +77,7 @@ namespace RecommendationEngine.Controllers
 
                 ethinicQuery = ethinicQuery.Substring(0, ethinicQuery.LastIndexOf(" or "));
 
-                string cmdHandleText = "SELECT top 5 TwitterHandle,InstagramHandle FROM dbo.SocialMedia WHERE " + ethinicQuery;
+                string cmdHandleText = "SELECT top 3 TwitterHandle,InstagramHandle FROM dbo.SocialMedia WHERE " + ethinicQuery;
 
                 var handles = db.Database.SqlQuery<HandleResults>(cmdHandleText).ToList();
 
