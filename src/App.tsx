@@ -6,6 +6,8 @@ import Header from './Header/Header';
 import Instagram from './Instagram/Instagram';
 import Twitter from './Twitter/Twitter';
 
+import { getTags, getKeywords, getLinks, getNewGUID } from './Utils/utils';
+
 import './App.css';
 
 import { ethnicityList } from './Utils/ethnicity';
@@ -82,7 +84,7 @@ class App extends React.Component<{}, IAppState> {
                   {/* <input type={'text'} className={'app-form-ethnicity-input'} required={true} /> */}
                   <select className={'app-form-ethnicity-input'} name={'ethnicity'} id={'ethnicity'}>
                     {
-                      ethnicityList.map((value, index) => <option key={index} value={value.replace(/\s+/g, '')}>{value}</option>)
+                      ethnicityList.map((value, index) => <option key={index} value={value}>{value}</option>)
                     }
                   </select>
                 </div>
@@ -117,7 +119,7 @@ class App extends React.Component<{}, IAppState> {
                 }
                 {
                   this.state.posted ?
-                    <a href={this.state.twitter} className={'app-posted-link'} target="_blank">Twitter</a>
+                    <a href={this.state.twitter} target="_blank">Twitter</a>
                     : null
                 }
               </div>
@@ -193,11 +195,47 @@ class App extends React.Component<{}, IAppState> {
 
         this.setState({ mediaArray: base64 });
 
-        this.postData(`https://contentpublisherapp.azurewebsites.net/api/CampaignPublisher?code=xBXdwIOJ5bAybRXcCm9LyN61IWavNk43a6CJLUtxg9zwZrPVVQW4CQ==`, { media: base64, mediaCategory: type, mediaType: ext, message: this.state.message + this.getLinks() })
+        // ethnicity api
+        this.getData(`https://recommendationengine.azurewebsites.net/api/recommendations/${this.state.ethnicity}`)
           .then(response => {
-            console.log(response);
-            this.setState({ posting: false, posted: true, twitter: response.split(' ')[1] });
 
+            const tags = getTags(response.SuggestedTags);
+            console.log(tags);
+
+            // keyword api
+            this.postData(`https://recommendationengine.azurewebsites.net/api/recommendations`, this.state.message)
+              .then(response => {
+
+                const keywords = getKeywords(response.SuggestedKeywordTags);
+                console.log(keywords);
+
+                // links api
+                this.postData(`https://urlcreate.azurewebsites.net/api/URLCreation?code=VGUNUOHanZnWnR7o6DgrtuDaR2WUu1zoYBvW64sqmbPNOWtoQ1vmIg==`, { GUID: getNewGUID() })
+                  .then(response => {
+
+                    const links = getLinks(response);
+                    console.log(links);
+
+                    const message = this.state.message + links + tags + keywords;
+                    console.log(message);
+
+                    if (message.length > 280) {
+                      alert('Tweet too long. Please shorten tweet.');
+                    }
+                    else {
+                      // publishing api
+                      this.postData(`https://contentpublisherapp.azurewebsites.net/api/CampaignPublisher?code=xBXdwIOJ5bAybRXcCm9LyN61IWavNk43a6CJLUtxg9zwZrPVVQW4CQ==`, { media: base64, mediaCategory: type, mediaType: ext, message: this.state.message + links + tags + keywords })
+                        .then(response => {
+                          console.log(response);
+                          this.setState({ posting: false, posted: true, twitter: response });
+
+                        }) // JSON from `response.json()` call
+                        .catch(error => console.error(error));
+                    }
+                  }) // JSON from `response.json()` call
+                  .catch(error => console.error(error));
+              }) // JSON from `response.json()` call
+              .catch(error => console.error(error));
           }) // JSON from `response.json()` call
           .catch(error => console.error(error));
       };
@@ -237,8 +275,21 @@ class App extends React.Component<{}, IAppState> {
       .catch(error => console.error(`Fetch Error =\n`, error));
   }
 
-  private getLinks() {
-    return ' Register: http://bit.ly/2NEjk3a Give: http://bit.ly/2NDHOcL Learn More: http://bit.ly/2v1tpiR';
+  private getData(url = ``) {
+    // Default options are marked with *
+    return fetch(url, {
+      method: "GET", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, cors, *same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      // credentials: "same-origin", // include, same-origin, *omit
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow", // manual, *follow, error
+      referrer: "no-referrer", // no-referrer, *client
+    })
+      .then(response => response.json()) // parses response to JSON
+      .catch(error => console.error(`Fetch Error =\n`, error));
   }
 }
 
