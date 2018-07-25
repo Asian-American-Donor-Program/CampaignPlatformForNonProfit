@@ -178,34 +178,39 @@ class CreateCampaignPage extends React.Component<{}, ICreateCampaignPageState> {
     }
 
     private onPost() {
-        this.setState({ preview: false, posting: true });
-        const fr = new FileReader();
-        fr.onload = () => {
-            const data = fr.result;
-            const base64 = btoa(data);
-            const typeArray = this.state.mediaType.split('/');
-            const type = typeArray[0];
-            const ext = typeArray[1];
 
-            this.setState({ mediaArray: base64 });
+        let confirm = window.confirm('Post to Social Media?');
 
-            if (this.state.message.length > 280) {
-                alert('Tweet too long. Please shorten tweet.');
-            }
-            else {
-                let url = 'https://contentpublisherapp.azurewebsites.net/api/CampaignPublisher?code=xBXdwIOJ5bAybRXcCm9LyN61IWavNk43a6CJLUtxg9zwZrPVVQW4CQ==';
-                // url = ''; // uncomment to disable posting
-                // publishing api
-                postData(url, { media: base64, mediaCategory: type, mediaType: ext, message: this.state.message })
-                    .then(response => {
-                        console.log(response);
-                        this.setState({ posting: false, posted: true, twitter: response });
+        if (confirm) {
+            this.setState({ posting: true });
+            const fr = new FileReader();
+            fr.onload = () => {
+                const data = fr.result;
+                const base64 = btoa(data);
+                const typeArray = this.state.mediaType.split('/');
+                const type = typeArray[0];
+                const ext = typeArray[1];
 
-                    }) // JSON from `response.json()` call
-                    .catch(error => console.error(error));
-            }
-        };
-        fr.readAsBinaryString(this.state.media);
+                this.setState({ mediaArray: base64 });
+
+                if (this.state.message.length > 280) {
+                    alert('Tweet too long. Please shorten tweet.');
+                }
+                else {
+                    let url = 'https://contentpublisherapp.azurewebsites.net/api/CampaignPublisher?code=xBXdwIOJ5bAybRXcCm9LyN61IWavNk43a6CJLUtxg9zwZrPVVQW4CQ==';
+                    // url = 'notaurl'; // uncomment to disable posting
+                    // publishing api
+                    postData(url, { media: base64, mediaCategory: type, mediaType: ext, message: this.state.message })
+                        .then(response => {
+                            console.log(response);
+                            this.setState({ posting: false, posted: true, twitter: response });
+
+                        }) // JSON from `response.json()` call
+                        .catch(error => console.error(error));
+                }
+            };
+            fr.readAsBinaryString(this.state.media);
+        }
     }
 
     private onPreview() {
