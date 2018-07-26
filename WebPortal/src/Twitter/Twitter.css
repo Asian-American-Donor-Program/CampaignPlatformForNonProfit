@@ -1,0 +1,79 @@
+.twitter {
+    min-width: 564px;
+    width: 564px;
+    padding: 12px;
+    margin: auto;
+    display: flex;
+    flex: 0;
+    flex-direction: row;
+    background-color: #ffffff;
+    text-align: left;
+}
+
+.twitter-persona {
+    height: 48px;
+    width: 48px;
+    border-radius: 50%;
+}
+
+.twitter-content {
+    padding: 0 0 0 10px;
+}
+
+.twitter-title-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.twitter-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.twitter-handle {
+    font-size: 14px;
+    font-weight: 400;
+    color: #657786;
+    padding: 0 0 0 5px;
+}
+
+.twitter-time {
+    font-size: 14px;
+    font-weight: 400;
+    color: #657786;
+    padding: 0 0 0 5px;
+}
+
+.twitter-tweet {
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.twitter-media-container {
+    padding: 10px 10px 10px 0;
+}
+
+.twitter-media {
+    border-radius: 5px;
+    max-width: 500px;
+}
+
+.twitter-actions {
+    display: flex;
+    flex-direction: row;
+    color: #657786;
+}
+
+.twitter-icon {
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+}
+
+.twitter-icon-text {
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 700;
+}

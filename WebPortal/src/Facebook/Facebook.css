@@ -1,0 +1,90 @@
+.facebook {
+    min-width: 588px;
+    width: 588px;
+    margin: auto;
+    display: flex;
+    flex: 0;
+    flex-direction: column;
+    background-color: #ffffff;
+    text-align: left;
+    font-family: 'Helvetica';
+    border-radius: 5px 5px 0 0;
+}
+
+.facebook-header {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+}
+
+.facebook-persona {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+}
+
+.facebook-name-container {
+    padding: 5px 0 0 10px;
+}
+
+.facebook-name {
+    color: #365899;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.facebook-time-container {
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    color: #616770;
+}
+
+.facebook-dot {
+    padding: 0 5px;
+}
+
+.facebook-time {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.facebook-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+}
+
+.facebook-message {
+    display: flex;
+    flex-direction: row;
+    padding: 0 10px 10px 10px;
+    color: #1d2129;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.facebook-media {
+    max-width: 588px;
+    min-height: 300px;
+}
+
+.facebook-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 13px 0;
+}
+
+.facebook-icon {
+    display: flex;
+    flex-direction: row;
+    color: #616770;
+    font-size: 14px;
+}
+
+.facebook-icon-text {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 0 0 5px;
+}

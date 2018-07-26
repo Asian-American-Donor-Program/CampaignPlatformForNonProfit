@@ -1,0 +1,94 @@
+.instagram {
+    min-width: 588px;
+    width: 588px;
+    margin: auto;
+    display: flex;
+    flex: 0;
+    flex-direction: column;
+    background-color: #ffffff;
+    text-align: left;
+    border-radius: 3px;
+}
+
+.instagram-header {
+    display: flex;
+    flex-direction: row;
+    padding: 15px;
+}
+
+.instgram-persona {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+}
+
+.instagram-name {
+    color: #262626;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 0 0 10px;
+}
+
+.instagram-media {
+    max-width: 588px;
+    min-height: 300px;
+}
+
+.instagram-actions {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+    color: #262626;
+    font-size: 30px;
+}
+
+.instagram-actions-left {
+    display: flex;
+    flex-direction: row;
+}
+
+.instagram-actions-left-icon {
+    padding: 0 0 0 15px;
+}
+
+.instagram-actions-right {
+    margin-left: auto;
+}
+
+.instagram-likes {
+    color: #262626;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0 0 10px 15px;
+}
+
+.instagram-comments-container {
+    padding: 0 15px;
+}
+
+.instagram-comment {
+    display: flex;
+    flex-direction: row;
+}
+
+.instagram-comment-name {
+    color: #262626;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.instagram-comment-text {
+    display: flex;
+    flex-direction: row;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 0 0 0 5px;
+}
+
+.instagram-time {
+    color: #999;
+    font-size: 10px;
+    font-weight: 400;
+    padding: 10px 15px;
+}

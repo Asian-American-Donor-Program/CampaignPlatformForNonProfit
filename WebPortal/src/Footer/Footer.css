@@ -1,0 +1,13 @@
+.footer {
+    display: flex;
+    flex: 0;
+    flex-direction: row;
+    justify-content: center;
+    padding: 10px 0px;
+}
+
+.footer-divider {
+   flex-grow: 0;
+   padding:  0px 30px;
+}
+
